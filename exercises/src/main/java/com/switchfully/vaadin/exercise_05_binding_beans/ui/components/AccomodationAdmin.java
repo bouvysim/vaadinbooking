@@ -36,12 +36,42 @@ public class AccomodationAdmin extends CustomComponent {
         // TODO Exercise 5: Add a 'Cancel' button to the form to close the form.
         // TODO Exercise 5 (Extra): Add ta DateField for creationDate to the form.
 
-        HorizontalLayout toolbar = new HorizontalLayout(filtering);
+        EditAccomodationForm form = new EditAccomodationForm(cityService);
+        form.setVisible(false);
+        form.addSavedAccomodationListener(accomodation -> {
+            accomodationService.save(accomodation);
+            populateGrid(accomodationService.getAccomodations());
+        });
+        form.addDeletedAccomodationListener(accomodation -> {
+            accomodationService.delete(accomodation.getId());
+            populateGrid(accomodationService.getAccomodations());
+        });
+
+        Button addAccomodationBtn = new Button("New Accomodation");
+        addAccomodationBtn.addClickListener(e -> form.setAccomodation(accomodation().build()));
+
+        HorizontalLayout toolbar = new HorizontalLayout(filtering, addAccomodationBtn);
         toolbar.setSpacing(true);
 
-        VerticalLayout mainLayout = new VerticalLayout(toolbar, grid);
+        HorizontalLayout accomodationsAssemble = new HorizontalLayout(grid, form);
+        accomodationsAssemble.setSpacing(true);
+        accomodationsAssemble.setSizeFull();
+        grid.setSizeFull();
+        accomodationsAssemble.setExpandRatio(grid,1);
+
+        grid.addSelectionListener(e -> {
+            if (e.getSelected().isEmpty()){
+                form.setVisible(false);
+            } else {
+                Accomodation accomodation = (Accomodation)e.getSelected().iterator().next();
+                form.setAccomodation(accomodation);
+            }
+        });
+
+        VerticalLayout mainLayout = new VerticalLayout(toolbar, accomodationsAssemble);
         mainLayout.setMargin(true);
         setCompositionRoot(mainLayout);
+
     }
 
     private CssLayout createFilterComponent(List<Accomodation> accomodations) {
@@ -80,5 +110,7 @@ public class AccomodationAdmin extends CustomComponent {
 
         grid.setContainerDataSource(container);
     }
+
+
 
 }

@@ -24,7 +24,20 @@ public class ExerciseUI extends UI {
 
         // TODO Exercise 4 (Extra): Add a checkbox to hide the button and make the TextField auto-commit.
 
-        VerticalLayout mainLayout = new VerticalLayout();
+        Property myProperty = new ObjectProperty<String>("Radisson");
+        TextField field = new TextField("Name", myProperty);
+
+        Label label = new Label(myProperty);
+        Button updateButton = new Button("Update");
+        updateButton.addClickListener(e -> field.commit());
+        CheckBox autoUpdate = new CheckBox("Auto commit?");
+        autoUpdate.addValueChangeListener(e -> {
+            updateButton.setVisible(!autoUpdate.getValue());
+            field.addTextChangeListener(event -> myProperty.setValue(event.getText()));
+        });
+
+
+        VerticalLayout mainLayout = new VerticalLayout(field, label, autoUpdate, updateButton);
         mainLayout.setMargin(true);
         setContent(mainLayout);
     }

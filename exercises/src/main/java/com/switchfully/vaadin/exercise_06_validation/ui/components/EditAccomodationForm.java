@@ -10,6 +10,8 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.data.validator.NullValidator;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.Page;
 import com.vaadin.server.UserError;
@@ -107,6 +109,8 @@ public class EditAccomodationForm extends FormLayout {
         name.setWidth("30em");
         name.setNullRepresentation("");
 
+
+
         return name;
     }
 
@@ -130,9 +134,20 @@ public class EditAccomodationForm extends FormLayout {
     }
 
     private void save() {
-        accomodationService.save(accomodation);
-        admin.updateList();
-        setVisible(false);
+        if (name != null && city != null) {
+            accomodationService.save(accomodation);
+            admin.updateList();
+            setVisible(false);
+        } else {
+            name.addValidator(e -> {
+                new NullValidator("Please provide a name", false);
+                Notification.show("Validation errors", "Please provide a name", Notification.Type.WARNING_MESSAGE);
+            });
+            city.addValidator(e-> {
+                new NullValidator("Please provide a city", false);
+                Notification.show("Validations errors", "Please provide a city", Notification.Type.WARNING_MESSAGE);
+            });
+        }
     }
 
 }
